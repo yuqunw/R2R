@@ -37,7 +37,7 @@ Adding geometry features from a pretrained 3D model (VGGT) to a VLM and training
 
 ## Updates
 
-**[Oct 2026]** Inference and evaluation code and model checkpoints are released. Training code and data-preparation scripts are coming soon.
+[Oct 2026] Inference and evaluation code and model checkpoints are released. Training code and data-preparation scripts are coming soon.
 
 ---
 
@@ -45,12 +45,12 @@ Adding geometry features from a pretrained 3D model (VGGT) to a VLM and training
 
 ### Installation
 
-1. **Clone this repository:**
+1. Clone this repository:
   ```bash
     git clone https://github.com/yuqunw/R2R.git
     cd R2R
   ```
-2. **Create conda environment and install dependencies:**
+2. Create a conda environment and install the dependencies:
   ```bash
     conda create -n r2r python=3.12 -y
     conda activate r2r
@@ -59,7 +59,7 @@ Adding geometry features from a pretrained 3D model (VGGT) to a VLM and training
     pip install flash-attn==2.8.2 --no-build-isolation
     pip install -e qwen-vl-utils
   ```
-3. **Set up VGGT:**
+3. Set up VGGT:
   ```bash
     bash tools/setup_vggt.sh   # clones VGGT into third_party/vggt and applies a small dtype patch
   ```
@@ -77,7 +77,7 @@ cd qwen-vl-finetune
 hf download yuqun/R2R-Qwen3-VL-8B --local-dir checkpoints/R2R-Qwen3-VL-8B
 ```
 
-All commands below are run from `qwen-vl-finetune/` and take a **local** checkpoint directory.
+All commands below are run from `qwen-vl-finetune/` and take a local checkpoint directory.
 
 ## Quick Demo
 
@@ -91,18 +91,18 @@ python qwenvl/eval/demo.py \
     --num-frames 32
 ```
 
-**Arguments:**
+Arguments:
 
 - `--video` or `--frames`: an input video, or a directory of frames (sorted by file name)
 - `--num-frames`: number of frames sampled uniformly from the input (default: 32)
 - `--fps`: frame rate of the `--frames` directory, used for the per-frame timestamps given to the model (default: 1.0)
 - `--max-new-tokens`: maximum answer length (default: 128)
 
-**Output:** The answer is printed to the terminal. VGGT features are computed on the fly.
+The answer is printed to the terminal. VGGT features are computed on the fly.
 
 ## Evaluation
 
-We evaluate on [VSI-Bench](https://huggingface.co/datasets/nyu-visionx/VSI-Bench), [ReVSI](https://huggingface.co/datasets/3dlg-hcvc/ReVSI) and our **3D-Point-QA** benchmark.
+We evaluate on [VSI-Bench](https://huggingface.co/datasets/nyu-visionx/VSI-Bench), [ReVSI](https://huggingface.co/datasets/3dlg-hcvc/ReVSI) and our 3D-Point-QA benchmark.
 
 ### Download Evaluation Data
 
@@ -124,7 +124,7 @@ hf download yuqun/3D-Point-QA --repo-type dataset --local-dir 3d_point_qa --incl
 cd 3d_point_qa && tar -xf val_images.tar && cd ../..
 ```
 
-**Data Structure:**
+The data should be organized as follows:
 
 ```
 qwen-vl-finetune/data/
@@ -145,32 +145,28 @@ qwen-vl-finetune/data/
 ### VSI-Bench and ReVSI
 
 ```bash
-CKPT=checkpoints/R2R-Qwen3-VL-8B BENCHMARKS="vsibench" MAX_FRAMES=128 GPUS="0 1 2 3" bash scripts/eval.sh
-CKPT=checkpoints/R2R-Qwen3-VL-8B BENCHMARKS="revsi"    MAX_FRAMES=64  GPUS="0 1 2 3" bash scripts/eval.sh
+bash scripts/eval_vsibench.sh
+bash scripts/eval_revsi.sh
 ```
 
-**Arguments** (environment variables):
+The settings are at the top of each script:
 
-- `CKPT`: local checkpoint directory
-- `BENCHMARKS`: `vsibench`, `revsi`, or both (default: `"vsibench revsi"`)
-- `MAX_FRAMES`: number of input frames (default: 32). For VSI-Bench, frames are sampled uniformly from the full video. For ReVSI, the official video with this many frames is used, so it must be 16, 32 or 64. The paper uses 128 (VSI-Bench) and 64 (ReVSI) for the 8B model, and 16 for the 4B model.
-- `GPUS`: GPU ids; samples are split across them (default: `"0"`)
+- `CKPT` and `BASE_MODEL`: the local checkpoint and its base model
+- `NUM_FRAMES`: number of input frames. For VSI-Bench, frames are sampled uniformly from the full video. For ReVSI, the official video with this many frames is used, so it must be 16, 32 or 64. The paper uses 128 (VSI-Bench) and 64 (ReVSI) for the 8B model, and 16 for the 4B model.
+- `GPUS`: GPU ids; questions are split across them by scene
 - `OUTPUT_DIR`: where results are written (default: `eval_results/<checkpoint name>`)
-- `LIMIT`: evaluate only the first N questions, for a quick check
 
-**Output:** `metrics_<benchmark>_<frames>f.json` and `.xlsx` with per-category and average scores (accuracy for multiple-choice questions, mean relative accuracy for numerical ones), plus the raw predictions in `predictions_<benchmark>_<frames>f_shard*.jsonl`.
+Each run writes `metrics_<benchmark>_<frames>f.json` and `.xlsx` with per-category and average scores (accuracy for multiple-choice questions, mean relative accuracy for numerical ones), plus the raw predictions in `predictions_<benchmark>_<frames>f_shard*.jsonl`.
 
 ### 3D-Point-QA
 
 [3D-Point-QA](https://huggingface.co/datasets/yuqun/3D-Point-QA) tests low-level geometric reasoning on ScanNet++, with points marked by colored arrows (drawn at load time). The validation split has five tasks: point-to-camera distance, point-to-point distance, relative distance comparison, point matching across views, and 3D coordinate mapping. The training split will be used by the upcoming training code.
 
 ```bash
-CKPT=checkpoints/R2R-Qwen3-VL-8B GPUS="0 1 2 3" bash scripts/eval_3d_point_qa.sh
+bash scripts/eval_3d_point_qa.sh
 ```
 
-`GPUS`, `OUTPUT_DIR` and `LIMIT` work as above.
-
-**Output:** `eval_results/<checkpoint name>/3d_point_qa/metrics_lowlevelqa.json` and `low_level_qa_summary.xlsx` with per-task metrics:
+`CKPT`, `BASE_MODEL`, `GPUS` and `OUTPUT_DIR` are set at the top of the script as above. Results are written to `eval_results/<checkpoint name>/3d_point_qa/metrics_lowlevelqa.json` and `low_level_qa_summary.xlsx`, with these per-task metrics:
 
 | Task | Metric |
 | --- | --- |
