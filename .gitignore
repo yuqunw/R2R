@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+outputs/
+eval_results/
+checkpoints/
+wandb/
+third_party/
+qwen-vl-finetune/data/*
+!qwen-vl-finetune/data/train_meta.json
+!qwen-vl-finetune/data/train_meta_baseline.json
