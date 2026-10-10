@@ -4,7 +4,7 @@
   <p align="center">
     <a href="http://yuqunw.github.io"><strong>Yuqun Wu</strong></a><sup>1</sup>
     ·
-    <a href="https://avaxiao.github.io/"><strong>Yao Xiao<sup>1</sup>
+    <a href="https://avaxiao.github.io/"><strong>Yao Xiao</strong></a><sup>1</sup>
     ·
     <a href="https://zouchuhang.github.io"><strong>Chuhang Zou</strong></a><sup>2</sup>
     ·
@@ -25,7 +25,6 @@
     <a href='https://huggingface.co/datasets/yuqun/3D-Point-QA' style='padding-left: 0.5rem;'>
       <img src='https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-3D--Point--QA-yellow?style=flat' alt='3D-Point-QA'></a>
   </p>
-</p>
 <p align="center">
 <img src="assets/teaser.png"/>
 </p>
